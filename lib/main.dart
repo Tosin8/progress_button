@@ -1,74 +1,225 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
-import 'dart:math';
 
 void main() {
-  runApp(const MaterialApp(title: 'Progress Demo', home: MyApp()));
+  runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Progress Button',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: const ProgressButtonHomePage()));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class ProgressButtonHomePage extends StatefulWidget {
+  const ProgressButtonHomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<ProgressButtonHomePage> createState() => _ProgressButtonHomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _ProgressButtonHomePageState extends State<ProgressButtonHomePage> {
   ButtonState stateOnlyText = ButtonState.idle;
+  ButtonState stateOnlyCustomIndicatorText = ButtonState.idle;
   ButtonState stateTextWithIcon = ButtonState.idle;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-      child: ProgressButton.icon(iconedButtons: {
+  ButtonState stateTextWithIconMinWidthState = ButtonState.idle;
+
+  Widget buildCustomButton() {
+    var progressTextButton = ProgressButton(
+      stateWidgets: const {
+        ButtonState.idle: Text(
+          "Idle",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        ButtonState.loading: Text(
+          "Loading",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        ButtonState.fail: Text(
+          "Fail",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        ButtonState.success: Text(
+          "Success",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        )
+      },
+      stateColors: {
+        ButtonState.idle: Colors.grey.shade400,
+        ButtonState.loading: Colors.blue.shade300,
+        ButtonState.fail: Colors.red.shade300,
+        ButtonState.success: Colors.green.shade400,
+      },
+      onPressed: onPressedCustomButton,
+      state: stateOnlyText,
+      padding: const EdgeInsets.all(8.0),
+    );
+    return progressTextButton;
+  }
+
+  Widget buildTextWithIcon() {
+    return ProgressButton.icon(iconedButtons: {
+      ButtonState.idle: IconedButton(
+          text: "Send",
+          icon: const Icon(Icons.send, color: Colors.white),
+          color: Colors.deepPurple.shade500),
+      ButtonState.loading:
+          IconedButton(text: "Loading", color: Colors.deepPurple.shade700),
+      ButtonState.fail: IconedButton(
+          text: "Failed",
+          icon: const Icon(Icons.cancel, color: Colors.white),
+          color: Colors.red.shade300),
+      ButtonState.success: IconedButton(
+          text: "Successful",
+          icon: const Icon(
+            Icons.check_circle,
+            color: Colors.white,
+          ),
+          color: Colors.green.shade400)
+    }, onPressed: onPressedIconWithText, state: stateTextWithIcon);
+  }
+
+  Widget buildTextWithIconWithMinState() {
+    return ProgressButton.icon(
+      iconedButtons: {
         ButtonState.idle: IconedButton(
-            text: 'Send',
+            text: "Send",
             icon: const Icon(Icons.send, color: Colors.white),
             color: Colors.deepPurple.shade500),
         ButtonState.loading:
-            IconedButton(text: 'Loading', color: Colors.deepPurple.shade700),
+            IconedButton(text: "Loading", color: Colors.deepPurple.shade700),
         ButtonState.fail: IconedButton(
-            text: 'Failed',
+            text: "Failed",
             icon: const Icon(Icons.cancel, color: Colors.white),
             color: Colors.red.shade300),
         ButtonState.success: IconedButton(
-            text: 'Success',
             icon: const Icon(
               Icons.check_circle,
               color: Colors.white,
             ),
-            color: Colors.green.shade400),
-      }, onPressed: onPressedIconWithText, state: stateTextWithIcon),
-    ));
+            color: Colors.green.shade400)
+      },
+      onPressed: onPressedIconWithMinWidthStateText,
+      state: stateTextWithIconMinWidthState,
+      minWidthStates: const [ButtonState.loading, ButtonState.success],
+    );
   }
-}
 
-void onPressedIconWithText() {
-  switch (stateTextWithIcon) {
-    case ButtonState.idle:
-      stateTextWithIcon = ButtonState.loading;
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          stateTextWithIcon = Random.secure().nextBool()
-              ? ButtonState.success
-              : ButtonState.fail;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Progress Button'),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            buildTextWithIcon(),
+            Container(
+              height: 32,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void onPressedCustomButton() {
+    setState(() {
+      switch (stateOnlyText) {
+        case ButtonState.idle:
+          stateOnlyText = ButtonState.loading;
+          break;
+        case ButtonState.loading:
+          stateOnlyText = ButtonState.fail;
+          break;
+        case ButtonState.success:
+          stateOnlyText = ButtonState.idle;
+          break;
+        case ButtonState.fail:
+          stateOnlyText = ButtonState.success;
+          break;
+      }
+    });
+  }
+
+  void onPressedCustomIndicatorButton() {
+    setState(() {
+      switch (stateOnlyCustomIndicatorText) {
+        case ButtonState.idle:
+          stateOnlyCustomIndicatorText = ButtonState.loading;
+          break;
+        case ButtonState.loading:
+          stateOnlyCustomIndicatorText = ButtonState.fail;
+          break;
+        case ButtonState.success:
+          stateOnlyCustomIndicatorText = ButtonState.idle;
+          break;
+        case ButtonState.fail:
+          stateOnlyCustomIndicatorText = ButtonState.success;
+          break;
+      }
+    });
+  }
+
+  void onPressedIconWithText() async {
+    switch (stateTextWithIcon) {
+      case ButtonState.idle:
+        stateTextWithIcon = ButtonState.loading;
+        Future.delayed(const Duration(seconds: 1), () {
+          setState(() {
+            stateTextWithIcon = Random.secure().nextBool()
+                ? ButtonState.success
+                : ButtonState.fail;
+          });
         });
-      });
-      break;
 
-    case ButtonState.loading:
-      break;
-    case ButtonState.success:
-      stateTextWithIcon = ButtonState.idle;
-      break;
-    case ButtonState.fail:
-      stateTextWithIcon = ButtonState.idle;
-      break;
-  }
-  setState(
-    () {
+        break;
+      case ButtonState.loading:
+        break;
+      case ButtonState.success:
+        stateTextWithIcon = ButtonState.idle;
+        break;
+      case ButtonState.fail:
+        stateTextWithIcon = ButtonState.idle;
+        break;
+    }
+    setState(() {
       stateTextWithIcon = stateTextWithIcon;
-    },
-  );
+    });
+  }
+
+  void onPressedIconWithMinWidthStateText() {
+    switch (stateTextWithIconMinWidthState) {
+      case ButtonState.idle:
+        stateTextWithIconMinWidthState = ButtonState.loading;
+        Future.delayed(const Duration(seconds: 1), () {
+          setState(() {
+            stateTextWithIconMinWidthState = Random.secure().nextBool()
+                ? ButtonState.success
+                : ButtonState.fail;
+          });
+        });
+
+        break;
+      case ButtonState.loading:
+        break;
+      case ButtonState.success:
+        stateTextWithIconMinWidthState = ButtonState.idle;
+        break;
+      case ButtonState.fail:
+        stateTextWithIconMinWidthState = ButtonState.idle;
+        break;
+    }
+    setState(() {
+      stateTextWithIconMinWidthState = stateTextWithIconMinWidthState;
+    });
+  }
 }
