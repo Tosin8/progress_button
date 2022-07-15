@@ -16,10 +16,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  ButtonState stateOnlyText = ButtonState.idle;
+    ButtonState stateTextWithIcon = ButtonState.idle;
   @override
   Widget build(BuildContext context) {
-    ButtonState stateOnlyText = ButtonState.idle;
-    ButtonState stateTextWithIcon = ButtonState.idle;
+    
 
     return Scaffold(
         body: Center(
