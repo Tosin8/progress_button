@@ -31,12 +31,18 @@ class _MyAppState extends State<MyApp> {
           text: 'Send',
           icon: const Icon(Icons.send, color: Colors.white),
           color: Colors.deepPurple.shade500), 
-          ButtonState.loading: IconedButton(text: 'Loading', color: Colors.deepPurple.shade700),
-          ButtonState.fail: IconedButton(text: 'Failed', icon: const Icon(Icons.cancel, color: Colors.white), 
+          ButtonState.loading: IconedButton(
+            text: 'Loading', 
+            color: Colors.deepPurple.shade700
+            ),
+          ButtonState.fail: IconedButton(
+            text: 'Failed', 
+            icon: const Icon(
+              Icons.cancel, color: Colors.white), 
           color: Colors.red.shade300), 
           ButtonState.success: const IconedButton(text: 'Success': icon: Icon(Icons.check_circle, color: Colors.white, ), 
           color: Colors.green.shade400
-        )
+        ), 
       },onPressed: onPressedIconWithText, state: stateTextWithIcon),
     ));
   }
